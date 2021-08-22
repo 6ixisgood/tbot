@@ -14,13 +14,13 @@ class Broker():
         self.required_funds = defaultdict(dict)
 
     def broker(self):
-        # determine if there are enough funds to run the strategies
+        # 1. determine if there are enough funds to run the strategies
         self.update_required_funds()
         if not self.check_funds():
             log.error("Not enough funds to run all strategies")
             return
 
-        # run strategies
+        # 2. run strategies
         while True:
             for name, strategy in self.strategies.items():
                 asyncio.run(strategy.trade())
@@ -31,7 +31,7 @@ class Broker():
     def check_funds(self):
         for exchange, pair in self.required_funds.items():
             for sym, amount in pair.items():
-                if not exchange.get_free_balance(sym) >= amount:
+                if not exchange.balance(sym)['free'] >= amount:
                     return False
         return True
 
